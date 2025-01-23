@@ -5,24 +5,28 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"log"
 	"os"
 )
 
 func main() {
 
-	if len(os.Args) != 1 {
-		log.Fatalln("No secret key provided")
+	if len(os.Args) != 2 {
+		fail("No secret key provided\n")
 	}
 
-	secret := os.Args[0]
+	secret := os.Args[1]
 
 	h := hmac.New(sha256.New, []byte(secret))
 
 	_, err := io.Copy(h, os.Stdin)
 	if err != nil {
-		log.Fatalf("Failed to write to hash: %v", err)
+		fail("Failed to write to hash: %v\n", err)
 	}
 
 	fmt.Printf("sha256=%x\n", h.Sum(nil))
+}
+
+func fail(m string, args ...any) {
+	fmt.Fprintf(os.Stderr, m, args...)
+	os.Exit(1)
 }
